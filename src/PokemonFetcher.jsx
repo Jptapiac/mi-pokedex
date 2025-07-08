@@ -1,160 +1,147 @@
-import React, { useState, useEffect } from 'react';
-import './PokemonFetcher.css';
-
-const tiposDisponibles = [
-  "normal", "fire", "water", "electric", "grass", "ice",
-  "fighting", "poison", "ground", "flying", "psychic", "bug",
-  "rock", "ghost", "dragon", "dark", "steel", "fairy"
-];
+import React, { useEffect, useState } from "react";
+import "./PokemonFetcher.css";
+import PokemonDetail from "./PokemonDetail";
+import "./PokemonDetail.css";
 
 const PokemonFetcher = () => {
   const [pokemones, setPokemones] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
-  const [tipoSeleccionado, setTipoSeleccionado] = useState("");
   const [busqueda, setBusqueda] = useState("");
-  const [cantidadMostrar, setCantidadMostrar] = useState(20);
-  const [modalPokemon, setModalPokemon] = useState(null);
+  const [tipo, setTipo] = useState("");
+  const [pokemonDetalle, setPokemonDetalle] = useState(null);
+  const [cantidad, setCantidad] = useState(10);
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const fetchTodos = async () => {
+    const fetchData = async () => {
+      setCargando(true);
       try {
-        setCargando(true);
-        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+        const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1025");
         const data = await res.json();
 
-        const detalles = await Promise.allSettled(
+        const resultados = await Promise.all(
           data.results.map(async (p) => {
             const resPoke = await fetch(p.url);
             const dataPoke = await resPoke.json();
             return {
               id: dataPoke.id,
-              nombre: dataPoke.name,
-              imagen: dataPoke.sprites.other['official-artwork'].front_default,
-              shiny: dataPoke.sprites.other['official-artwork'].front_shiny,
-              tipos: dataPoke.types.map(t => t.type.name),
-              altura: dataPoke.height / 10,
-              peso: dataPoke.weight / 10,
-              habilidades: dataPoke.abilities.map(h => h.ability.name),
-              generos: dataPoke.name === 'nidoran-f' ? ['♀'] : dataPoke.name === 'nidoran-m' ? ['♂'] : ['♂', '♀'],
-              mostrandoShiny: false
+              name: dataPoke.name,
+              imagen: dataPoke.sprites.other["official-artwork"].front_default,
+              shiny: dataPoke.sprites.other["official-artwork"].front_shiny,
+              tipos: dataPoke.types.map((t) => t.type.name),
+              altura: dataPoke.height,
+              peso: dataPoke.weight,
+              habilidades: dataPoke.abilities.map((h) => h.ability.name),
+              sprites: dataPoke.sprites,
+              types: dataPoke.types,
+              abilities: dataPoke.abilities,
+              weight: dataPoke.weight,
+              height: dataPoke.height,
+              gender_rate: dataPoke.gender_rate ?? 1,
             };
           })
         );
 
-        const final = detalles.filter(d => d.status === "fulfilled").map(d => d.value);
-        setPokemones(final);
-      } catch {
-        setError("Error al cargar los Pokémon");
-      } finally {
-        setCargando(false);
+        setPokemones(resultados);
+      } catch (error) {
+        console.error("Error al cargar Pokémon", error);
       }
+      setCargando(false);
     };
 
-    fetchTodos();
+    fetchData();
   }, []);
 
-  const toggleShiny = (index) => {
-    const actualizados = [...pokemones];
-    actualizados[index].mostrandoShiny = !actualizados[index].mostrandoShiny;
-    setPokemones(actualizados);
+  const filtrar = () => {
+    return pokemones.filter(
+      (p) =>
+        p.name.toLowerCase().includes(busqueda.toLowerCase()) &&
+        (tipo === "" || p.tipos.includes(tipo))
+    );
+  };
+
+  const pokemonesAMostrar = filtrar().slice(0, cantidad);
+
+  const toggleShiny = (id) => {
+    setPokemones((prev) =>
+      prev.map((p) =>
+        p.id === id ? { ...p, mostrandoShiny: !p.mostrandoShiny } : p
+      )
+    );
   };
 
   const sorprenderme = () => {
     const mezclados = [...pokemones].sort(() => Math.random() - 0.5);
     setBusqueda("");
-    setTipoSeleccionado("");
-    setCantidadMostrar(20);
+    setTipo("");
+    setCantidad(10);
     setPokemones(mezclados);
   };
 
   const reiniciar = () => {
     setBusqueda("");
-    setTipoSeleccionado("");
-    setCantidadMostrar(20);
-    setPokemones([...pokemones].sort((a, b) => a.id - b.id));
+    setTipo("");
+    setCantidad(10);
+    setPokemonDetalle(null);
   };
 
-  const filtrar = () => {
-    return pokemones.filter(p =>
-      p.nombre.toLowerCase().includes(busqueda.toLowerCase()) &&
-      (tipoSeleccionado === "" || p.tipos.includes(tipoSeleccionado))
-    );
+  const abrirModal = (poke) => {
+    setPokemonDetalle(poke);
   };
-
-  const pokemonesFiltrados = filtrar().slice(0, cantidadMostrar);
 
   if (cargando) return <div className="pokemon-container">Cargando Pokémon...</div>;
-  if (error) return <div className="pokemon-container error">Error: {error}</div>;
 
   return (
     <div className="pokemon-container">
       <h1>¡Mi Pokédex!</h1>
+
       <div className="acciones">
-        <button onClick={sorprenderme} className="sorprendeme-button">🔁 ¡Sorpréndeme!</button>
-        <button onClick={reiniciar} className="reiniciar-button">🔄 Reiniciar Pokédex</button>
+        <button className="sorprendeme-button" onClick={sorprenderme}>🔁 ¡Sorpréndeme!</button>
+        <button className="reiniciar-button" onClick={reiniciar}>🔄 Reiniciar Pokédex</button>
         <input
           type="text"
           placeholder="Buscar por nombre..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
-        <select value={tipoSeleccionado} onChange={(e) => setTipoSeleccionado(e.target.value)}>
+        <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
           <option value="">Todos los tipos</option>
-          {tiposDisponibles.map((tipo) => (
-            <option key={tipo} value={tipo}>
-              {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-            </option>
+          {["normal", "fire", "water", "grass", "electric", "ice", "fighting",
+            "poison", "ground", "flying", "psychic", "bug", "rock", "ghost",
+            "dragon", "dark", "steel", "fairy"
+          ].map((t) => (
+            <option key={t} value={t}>{t}</option>
           ))}
         </select>
       </div>
 
       <h2>Pokédex</h2>
       <div className="pokemon-list">
-        {pokemonesFiltrados.map((pokemon, index) => (
-          <div key={pokemon.id} className="pokemon-card" onClick={() => setModalPokemon(pokemon)}>
-            <img src={pokemon.mostrandoShiny ? pokemon.shiny : pokemon.imagen} alt={pokemon.nombre} />
-            <p><strong>N.º {pokemon.id.toString().padStart(4, '0')}</strong></p>
-            <h3>{pokemon.nombre.charAt(0).toUpperCase() + pokemon.nombre.slice(1)}</h3>
-            <p>
-              {pokemon.tipos.map((tipo, i) => (
-                <span key={i} className={`tipo-label tipo-${tipo}`}>{tipo}</span>
-              ))}
-            </p>
-            <button
-              className="shiny-button"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleShiny(index);
-              }}
-            >
-              {pokemon.mostrandoShiny ? "Ver normal" : "Ver shiny"}
+        {pokemonesAMostrar.map((p) => (
+          <div key={p.id} className="pokemon-card" onClick={() => abrirModal(p)}>
+            <img src={p.mostrandoShiny ? p.shiny : p.imagen} alt={p.name} />
+            <p><strong>N.º {p.id.toString().padStart(4, '0')}</strong></p>
+            <h3>{p.name.charAt(0).toUpperCase() + p.name.slice(1)}</h3>
+            <p>{p.tipos.map((t, i) => (
+              <span key={i} className={`tipo-label tipo-${t}`}>{t}</span>
+            ))}</p>
+            <button className="shiny-button" onClick={(e) => { e.stopPropagation(); toggleShiny(p.id); }}>
+              {p.mostrandoShiny ? "Ver normal" : "Ver shiny"}
             </button>
           </div>
         ))}
       </div>
 
-      {pokemonesFiltrados.length < filtrar().length && (
+      {pokemonesAMostrar.length < filtrar().length && (
         <div className="cargar-mas">
-          <button onClick={() => setCantidadMostrar(cantidadMostrar + 20)}>Cargar más Pokémon</button>
+          <button onClick={() => setCantidad(cantidad + 10)}>Cargar más Pokémon</button>
         </div>
       )}
 
-      {modalPokemon && (
-        <div className="modal" onClick={() => setModalPokemon(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>{modalPokemon.nombre}</h2>
-            <img src={modalPokemon.imagen} alt="normal" />
-            <img src={modalPokemon.shiny} alt="shiny" style={{ maxWidth: '100px' }} />
-            <p><strong>ID:</strong> {modalPokemon.id}</p>
-            <p><strong>Tipos:</strong> {modalPokemon.tipos.join(', ')}</p>
-            <p><strong>Altura:</strong> {modalPokemon.altura} m</p>
-            <p><strong>Peso:</strong> {modalPokemon.peso} kg</p>
-            <p><strong>Habilidades:</strong> {modalPokemon.habilidades.join(', ')}</p>
-            <p><strong>Géneros:</strong> {modalPokemon.generos.join(', ')}</p>
-            <button onClick={() => setModalPokemon(null)}>Cerrar</button>
-          </div>
-        </div>
+      {pokemonDetalle && (
+        <PokemonDetail
+          pokemon={pokemonDetalle}
+          onClose={() => setPokemonDetalle(null)}
+        />
       )}
     </div>
   );
