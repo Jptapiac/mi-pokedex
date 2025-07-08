@@ -1,26 +1,32 @@
 import React from "react";
 import "./PokemonCard.css";
 
-function PokemonCard({ pokemon, onClick }) {
+ function PokemonCard({ pokemon, onClick, traduccionTipos }) {
   return (
-    <div className="pokemon-card" onClick={() => onClick(pokemon)}>
+    <div className="pokemon-card" onClick={onClick}>
       <img
-        src={pokemon.sprites.front_default}
-        alt={pokemon.name}
-        className="pokemon-image"
+        src={pokemon.mostrandoShiny ? pokemon.imagenShiny : pokemon.imagen}
+        alt={pokemon.nombre}
       />
-      <h3>N.º {pokemon.id.toString().padStart(4, "0")}</h3>
-      <h2>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</h2>
-      <div className="types">
-        {pokemon.types.map((typeObj) => (
-          <span key={typeObj.type.name} className={`type ${typeObj.type.name}`}>
-            {typeObj.type.name}
+      <p className="pokemon-id">N.º {pokemon.id.toString().padStart(4, "0")}</p>
+      <h3>{pokemon.nombre}</h3>
+      <div className="pokemon-tipos">
+        {pokemon.tipos.map((tipo) => (
+          <span key={tipo} className={`tipo ${tipo}`}>
+            {traduccionTipos[tipo] || tipo}
           </span>
         ))}
       </div>
-      <button className="shiny-button">Ver shiny</button>
+      <button
+        className="btn-shiny"
+        onClick={(e) => {
+          e.stopPropagation(); // evita que se abra el modal al hacer clic en el botón
+          pokemon.mostrandoShiny = !pokemon.mostrandoShiny;
+        }}
+      >
+        Ver shiny
+      </button>
     </div>
   );
 }
-
 export default PokemonCard;

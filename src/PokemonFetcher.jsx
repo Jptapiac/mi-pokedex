@@ -5,6 +5,7 @@ import "./PokemonDetail.css";
 
 const PokemonFetcher = () => {
   const [pokemones, setPokemones] = useState([]);
+  const [filtrados, setFiltrados] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [tipo, setTipo] = useState("");
   const [pokemonDetalle, setPokemonDetalle] = useState(null);
@@ -32,16 +33,13 @@ const PokemonFetcher = () => {
               peso: dataPoke.weight,
               habilidades: dataPoke.abilities.map((h) => h.ability.name),
               sprites: dataPoke.sprites,
-              types: dataPoke.types,
-              abilities: dataPoke.abilities,
-              weight: dataPoke.weight,
-              height: dataPoke.height,
-              gender_rate: dataPoke.gender_rate ?? 1,
+              mostrandoShiny: false,
             };
           })
         );
 
         setPokemones(resultados);
+        setFiltrados(resultados);
       } catch (error) {
         console.error("Error al cargar Pokémon", error);
       }
@@ -52,17 +50,19 @@ const PokemonFetcher = () => {
   }, []);
 
   const filtrar = () => {
-    return pokemones.filter(
+    const resultado = pokemones.filter(
       (p) =>
         p.name.toLowerCase().includes(busqueda.toLowerCase()) &&
         (tipo === "" || p.tipos.includes(tipo))
     );
+    setFiltrados(resultado);
+    setCantidad(10);
   };
 
-  const pokemonesAMostrar = filtrar().slice(0, cantidad);
+  const pokemonesAMostrar = filtrados.slice(0, cantidad);
 
   const toggleShiny = (id) => {
-    setPokemones((prev) =>
+    setFiltrados((prev) =>
       prev.map((p) =>
         p.id === id ? { ...p, mostrandoShiny: !p.mostrandoShiny } : p
       )
@@ -70,33 +70,44 @@ const PokemonFetcher = () => {
   };
 
   const sorprenderme = () => {
-    const mezclados = [...pokemones].sort(() => Math.random() - 0.5);
-    setBusqueda("");
-    setTipo("");
-    setCantidad(10);
-    setPokemones(mezclados);
-  };
+  const aleatorios = [...pokemones]
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 10); // 10 pokemones
+
+  setBusqueda("");
+  setTipo("");
+  setPokemonDetalle(null); // Cierra el modal si estaba abierto
+  setFiltrados(aleatorios);
+  setCantidad(10); // Reinicia el contador para que el botón “Cargar más” funcione si se quiere
+};
+
 
   const reiniciar = () => {
     setBusqueda("");
     setTipo("");
     setCantidad(10);
     setPokemonDetalle(null);
+    setFiltrados(pokemones);
   };
 
   const abrirModal = (poke) => {
     setPokemonDetalle(poke);
   };
 
-  if (cargando) return <div className="pokemon-container">Cargando Pokémon...</div>;
+  if (cargando)
+    return <div className="pokemon-container">Cargando Pokémon...</div>;
 
   return (
     <div className="pokemon-container">
       <h1>¡Mi Pokédex!</h1>
 
       <div className="acciones">
-        <button className="sorprendeme-button" onClick={sorprenderme}>🔁 ¡Sorpréndeme!</button>
-        <button className="reiniciar-button" onClick={reiniciar}>🔄 Reiniciar Pokédex</button>
+        <button className="sorprendeme-button" onClick={sorprenderme}>
+          🔁 ¡Sorpréndeme!
+        </button>
+        <button className="reiniciar-button" onClick={reiniciar}>
+          🔄 Reiniciar Pokédex
+        </button>
         <input
           type="text"
           placeholder="Buscar por nombre..."
@@ -105,35 +116,72 @@ const PokemonFetcher = () => {
         />
         <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
           <option value="">Todos los tipos</option>
-          {["normal", "fire", "water", "grass", "electric", "ice", "fighting",
-            "poison", "ground", "flying", "psychic", "bug", "rock", "ghost",
-            "dragon", "dark", "steel", "fairy"
+          {[
+            "normal",
+            "fire",
+            "water",
+            "grass",
+            "electric",
+            "ice",
+            "fighting",
+            "poison",
+            "ground",
+            "flying",
+            "psychic",
+            "bug",
+            "rock",
+            "ghost",
+            "dragon",
+            "dark",
+            "steel",
+            "fairy",
           ].map((t) => (
-            <option key={t} value={t}>{t}</option>
+            <option key={t} value={t}>
+              {t}
+            </option>
           ))}
         </select>
+        <button onClick={filtrar}>Filtrar</button>
       </div>
 
       <h2>Pokédex</h2>
       <div className="pokemon-list">
         {pokemonesAMostrar.map((p) => (
-          <div key={p.id} className="pokemon-card" onClick={() => abrirModal(p)}>
+          <div
+            key={p.id}
+            className="pokemon-card"
+            onClick={() => abrirModal(p)}
+          >
             <img src={p.mostrandoShiny ? p.shiny : p.imagen} alt={p.name} />
-            <p><strong>N.º {p.id.toString().padStart(4, '0')}</strong></p>
+            <p>
+              <strong>N.º {p.id.toString().padStart(4, "0")}</strong>
+            </p>
             <h3>{p.name.charAt(0).toUpperCase() + p.name.slice(1)}</h3>
-            <p>{p.tipos.map((t, i) => (
-              <span key={i} className={`tipo-label tipo-${t}`}>{t}</span>
-            ))}</p>
-            <button className="shiny-button" onClick={(e) => { e.stopPropagation(); toggleShiny(p.id); }}>
+            <p>
+              {p.tipos.map((t, i) => (
+                <span key={i} className={`tipo-label tipo-${t}`}>
+                  {t}
+                </span>
+              ))}
+            </p>
+            <button
+              className="shiny-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleShiny(p.id);
+              }}
+            >
               {p.mostrandoShiny ? "Ver normal" : "Ver shiny"}
             </button>
           </div>
         ))}
       </div>
 
-      {pokemonesAMostrar.length < filtrar().length && (
+      {pokemonesAMostrar.length < filtrados.length && (
         <div className="cargar-mas">
-          <button onClick={() => setCantidad(cantidad + 10)}>Cargar más Pokémon</button>
+          <button onClick={() => setCantidad(cantidad + 10)}>
+            Cargar más Pokémon
+          </button>
         </div>
       )}
 
