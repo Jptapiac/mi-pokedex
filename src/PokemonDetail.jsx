@@ -20,17 +20,25 @@ const weaknessesByType = {
   dark: ["Fighting", "Bug", "Fairy"],
   dragon: ["Ice", "Dragon", "Fairy"],
   steel: ["Fire", "Fighting", "Ground"],
-  fairy: ["Poison", "Steel"]
+  fairy: ["Poison", "Steel"],
 };
 
 const PokemonDetail = ({ pokemon, onClose }) => {
-  const tipos = pokemon.types.map((t) => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1));
+  if (!pokemon) return null;
 
-  const debilidades = Array.from(
-    new Set(
-      pokemon.types.flatMap((t) => weaknessesByType[t.type.name] || [])
-    )
-  );
+  const tipos = pokemon.tipos
+    ? pokemon.tipos.map((t) => t.charAt(0).toUpperCase() + t.slice(1))
+    : [];
+
+  const debilidades = pokemon.tipos
+    ? Array.from(
+        new Set(pokemon.tipos.flatMap((t) => weaknessesByType[t] || []))
+      )
+    : [];
+
+  const habilidades = pokemon.habilidades?.length
+    ? pokemon.habilidades.join(", ")
+    : "No disponibles";
 
   return (
     <div className="detalle">
@@ -41,11 +49,11 @@ const PokemonDetail = ({ pokemon, onClose }) => {
         <img src={pokemon.shiny} alt={pokemon.name + " shiny"} />
       </div>
       <p><strong>ID:</strong> {pokemon.id}</p>
-      <p><strong>Types:</strong> {tipos.join(", ")}</p>
-      <p><strong>Height:</strong> {pokemon.altura} m</p>
-      <p><strong>Weight:</strong> {pokemon.peso} kg</p>
-      <p><strong>Abilities:</strong> {pokemon.habilidades.join(", ")}</p>
-      <p><strong>Weaknesses:</strong> {debilidades.join(", ")}</p>
+      <p><strong>Tipos:</strong> {tipos.join(", ")}</p>
+      <p><strong>Altura:</strong> {pokemon.altura / 10} m</p>
+      <p><strong>Peso:</strong> {pokemon.peso / 10} kg</p>
+      <p><strong>Habilidades:</strong> {habilidades}</p>
+      <p><strong>Debilidades:</strong> {debilidades.join(", ") || "No disponibles"}</p>
     </div>
   );
 };
