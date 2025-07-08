@@ -1,0 +1,202 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: #000;
+  font-family: Arial, sans-serif;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+}
+
+.pokemon-container {
+  padding: 2rem;
+  max-width: 1300px;
+  width: 100%;
+  text-align: center;
+  background-color: #111;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  margin-top: 2rem;
+}
+
+.pokemon-container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.pokemon-container h2 {
+  font-size: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.acciones input,
+.acciones select {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  background-color: #222;
+  color: white;
+}
+
+/* Botón ¡Sorpréndeme! */
+.sorprendeme-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #29b6f6;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sorprendeme-button:hover {
+  background-color: #0288d1;
+  transform: scale(1.02);
+}
+
+.pokemon-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+.pokemon-card {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 1rem;
+  width: 180px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pokemon-card:hover {
+  transform: translateY(-4px);
+}
+
+.pokemon-card img {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 8px;
+}
+
+.pokemon-card h3 {
+  font-size: 1rem;
+  color: #f1f1f1;
+  margin: 0.4rem 0 0.2rem;
+}
+
+.pokemon-card p {
+  margin: 0.2rem 0;
+  font-size: 0.85rem;
+  color: #ccc;
+  font-weight: bold;
+}
+
+/* Botón Ver shiny */
+.shiny-button {
+  margin-top: 8px;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.shiny-button:hover {
+  background-color: #555;
+}
+
+/* Etiquetas de tipo */
+.tipo-label {
+  display: inline-block;
+  padding: 3px 8px;
+  margin: 2px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: white;
+  text-transform: capitalize;
+}
+
+/* Colores por tipo */
+.tipo-fire { background-color: #f08030; }
+.tipo-water { background-color: #6890f0; }
+.tipo-grass { background-color: #78c850; }
+.tipo-electric { background-color: #f8d030; }
+.tipo-psychic { background-color: #f85888; }
+.tipo-ice { background-color: #98d8d8; }
+.tipo-rock { background-color: #b8a038; }
+.tipo-ground { background-color: #e0c068; }
+.tipo-poison { background-color: #a040a0; }
+.tipo-bug { background-color: #a8b820; }
+.tipo-normal { background-color: #a8a878; }
+.tipo-flying { background-color: #a890f0; }
+.tipo-fighting { background-color: #c03028; }
+.tipo-dragon { background-color: #7038f8; }
+.tipo-ghost { background-color: #705898; }
+.tipo-dark { background-color: #705848; }
+.tipo-steel { background-color: #b8b8d0; }
+.tipo-fairy { background-color: #ee99ac; }
+
+/* Cargar más Pokémon */
+.cargar-mas {
+  margin-top: 2rem;
+}
+
+.cargar-mas button {
+  background-color: #29b6f6;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cargar-mas button:hover {
+  background-color: #0288d1;
+}
+
+@media (max-width: 600px) {
+  body {
+    align-items: flex-start;
+  }
+
+  .pokemon-card {
+    width: 100%;
+  }
+
+  .pokemon-container {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+}
+
