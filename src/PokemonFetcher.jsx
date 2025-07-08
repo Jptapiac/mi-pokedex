@@ -8,18 +8,19 @@ const tiposDisponibles = [
 ];
 
 const PokemonFetcher = () => {
+  const [pokemonesOriginales, setPokemonesOriginales] = useState([]);
   const [pokemones, setPokemones] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [tipoSeleccionado, setTipoSeleccionado] = useState("");
   const [busqueda, setBusqueda] = useState("");
-  const [cantidadMostrar, setCantidadMostrar] = useState(10);
+  const [cantidadMostrar, setCantidadMostrar] = useState(20);
 
   useEffect(() => {
     const fetchTodos = async () => {
       try {
         setCargando(true);
-        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1008');
+        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
         const data = await res.json();
 
         const todos = await Promise.allSettled(
@@ -44,9 +45,11 @@ const PokemonFetcher = () => {
 
         const filtrados = todos
           .filter(r => r.status === "fulfilled" && r.value !== null)
-          .map(r => r.value);
+          .map(r => r.value)
+          .sort((a, b) => a.id - b.id);
 
         setPokemones(filtrados);
+        setPokemonesOriginales(filtrados);
       } catch (err) {
         setError("Error al cargar los Pokémon");
       } finally {
@@ -64,11 +67,24 @@ const PokemonFetcher = () => {
   };
 
   const sorprenderme = () => {
-    const mezclados = filtrar().sort(() => Math.random() - 0.5);
+    const mezclados = [...pokemonesOriginales]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 20);
+
     setBusqueda("");
     setTipoSeleccionado("");
     setCantidadMostrar(20);
-    setPokemones(mezclados);
+    setPokemones([
+      ...mezclados,
+      ...pokemonesOriginales.filter(p => !mezclados.includes(p))
+    ]);
+  };
+
+  const reiniciar = () => {
+    setBusqueda("");
+    setTipoSeleccionado("");
+    setCantidadMostrar(20);
+    setPokemones(pokemonesOriginales);
   };
 
   const filtrar = () => {
@@ -92,6 +108,10 @@ const PokemonFetcher = () => {
           <span>🔁</span> ¡Sorpréndeme!
         </button>
 
+        <button onClick={reiniciar} className="reiniciar-button">
+          🔄 Reiniciar Pokédex
+        </button>
+
         <input
           type="text"
           placeholder="Buscar por nombre..."
@@ -102,7 +122,9 @@ const PokemonFetcher = () => {
         <select onChange={(e) => setTipoSeleccionado(e.target.value)} value={tipoSeleccionado}>
           <option value="">Todos los tipos</option>
           {tiposDisponibles.map((tipo) => (
-            <option key={tipo} value={tipo}>{tipo.charAt(0).toUpperCase() + tipo.slice(1)}</option>
+            <option key={tipo} value={tipo}>
+              {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+            </option>
           ))}
         </select>
       </div>
