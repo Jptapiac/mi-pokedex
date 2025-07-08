@@ -42,7 +42,7 @@ const PokemonDetail = ({ pokemon, onClose }) => {
 
   return (
     <div className="detalle">
-      <button className="cerrar" onClick={onClose}>✖</button>
+      <button className="cerrar" onClick={onClose}>🔙 Volver a la Pokédex</button>
       <h2>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</h2>
       <div className="imagenes">
         <img src={pokemon.imagen} alt={pokemon.name} />
