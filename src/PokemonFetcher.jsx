@@ -8,13 +8,14 @@ const tiposDisponibles = [
 ];
 
 const PokemonFetcher = () => {
-  const [pokemonesOriginales, setPokemonesOriginales] = useState([]);
-  const [pokemones, setPokemones] = useState([]);
+  const [todosPokemones, setTodosPokemones] = useState([]);
+  const [pokemonesMostrados, setPokemonesMostrados] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [tipoSeleccionado, setTipoSeleccionado] = useState("");
   const [busqueda, setBusqueda] = useState("");
   const [cantidadMostrar, setCantidadMostrar] = useState(20);
+  const [modoSorpresa, setModoSorpresa] = useState(false); // ⚠️ nuevo estado
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -48,8 +49,8 @@ const PokemonFetcher = () => {
           .map(r => r.value)
           .sort((a, b) => a.id - b.id);
 
-        setPokemones(filtrados);
-        setPokemonesOriginales(filtrados);
+        setTodosPokemones(filtrados);
+        setPokemonesMostrados(filtrados);
       } catch (err) {
         setError("Error al cargar los Pokémon");
       } finally {
@@ -61,40 +62,40 @@ const PokemonFetcher = () => {
   }, []);
 
   const toggleShiny = (index) => {
-    const actualizados = [...pokemones];
-    actualizados[index].mostrandoShiny = !actualizados[index].mostrandoShiny;
-    setPokemones(actualizados);
+    const actualizados = [...pokemonesFiltrados()];
+    const pokeIndex = todosPokemones.findIndex(p => p.id === actualizados[index].id);
+    const nuevos = [...todosPokemones];
+    nuevos[pokeIndex].mostrandoShiny = !nuevos[pokeIndex].mostrandoShiny;
+    setTodosPokemones(nuevos);
   };
 
   const sorprenderme = () => {
-    const mezclados = [...pokemonesOriginales]
+    const mezclados = [...todosPokemones]
       .sort(() => Math.random() - 0.5)
       .slice(0, 20);
-
+    setModoSorpresa(true);
+    setCantidadMostrar(20);
     setBusqueda("");
     setTipoSeleccionado("");
-    setCantidadMostrar(20);
-    setPokemones([
-      ...mezclados,
-      ...pokemonesOriginales.filter(p => !mezclados.includes(p))
-    ]);
+    setPokemonesMostrados(mezclados);
   };
 
-  const reiniciar = () => {
+  const reiniciarPokedex = () => {
+    setModoSorpresa(false);
+    setCantidadMostrar(20);
     setBusqueda("");
     setTipoSeleccionado("");
-    setCantidadMostrar(20);
-    setPokemones(pokemonesOriginales);
+    setPokemonesMostrados(todosPokemones);
   };
 
   const filtrar = () => {
-    return pokemones.filter(p =>
+    return pokemonesMostrados.filter(p =>
       p.nombre.toLowerCase().includes(busqueda.toLowerCase()) &&
       (tipoSeleccionado === "" || p.tipos.includes(tipoSeleccionado))
     );
   };
 
-  const pokemonesFiltrados = filtrar().slice(0, cantidadMostrar);
+  const pokemonesFiltrados = () => filtrar().slice(0, cantidadMostrar);
 
   if (cargando) return <div className="pokemon-container">Cargando Pokémon...</div>;
   if (error) return <div className="pokemon-container error">Error: {error}</div>;
@@ -105,12 +106,14 @@ const PokemonFetcher = () => {
 
       <div className="acciones">
         <button onClick={sorprenderme} className="sorprendeme-button">
-          <span>🔁</span> ¡Sorpréndeme!
+          🔁 ¡Sorpréndeme!
         </button>
 
-        <button onClick={reiniciar} className="reiniciar-button">
-          🔄 Reiniciar Pokédex
-        </button>
+        {modoSorpresa && (
+          <button onClick={reiniciarPokedex} className="reiniciar-button">
+            🔄 Reiniciar Pokédex
+          </button>
+        )}
 
         <input
           type="text"
@@ -132,7 +135,7 @@ const PokemonFetcher = () => {
       <h2>Pokédex</h2>
 
       <div className="pokemon-list">
-        {pokemonesFiltrados.map((pokemon, index) => (
+        {pokemonesFiltrados().map((pokemon, index) => (
           <div key={pokemon.id} className="pokemon-card">
             <img
               src={pokemon.mostrandoShiny ? pokemon.shiny : pokemon.imagen}
@@ -155,7 +158,7 @@ const PokemonFetcher = () => {
         ))}
       </div>
 
-      {pokemonesFiltrados.length < filtrar().length && (
+      {!modoSorpresa && pokemonesFiltrados().length < filtrar().length && (
         <div className="cargar-mas">
           <button onClick={() => setCantidadMostrar(cantidadMostrar + 20)}>
             Cargar más Pokémon
