@@ -1,5 +1,5 @@
 // PokemonDetail.jsx
-import React from "react";
+import React, { useState } from "react";
 import "./PokemonDetail.css";
 
 const weaknessesByType = {
@@ -24,6 +24,7 @@ const weaknessesByType = {
 };
 
 const PokemonDetail = ({ pokemon, onClose }) => {
+  const [mostrarShiny, setMostrarShiny] = useState(false);
   if (!pokemon) return null;
 
   const tipos = pokemon.tipos
@@ -41,19 +42,32 @@ const PokemonDetail = ({ pokemon, onClose }) => {
     : "No disponibles";
 
   return (
-    <div className="detalle">
-      <button className="cerrar" onClick={onClose}>🔙 Volver a la Pokédex</button>
+    <div className="pokemon-detail">
+      <button onClick={onClose}>🔙 Volver a la Pokédex</button>
       <h2>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</h2>
-      <div className="imagenes">
-        <img src={pokemon.imagen} alt={pokemon.name} />
-        <img src={pokemon.shiny} alt={pokemon.name + " shiny"} />
+
+      <div
+        className={`card-container ${mostrarShiny ? "flip" : ""}`}
+        onClick={() => setMostrarShiny(!mostrarShiny)}
+      >
+        <div className="card-inner">
+          <div className="card-front">
+            <img src={pokemon.imagen} alt={pokemon.name} />
+          </div>
+          <div className="card-back shiny-glow">
+            <img src={pokemon.shiny} alt={pokemon.name + " shiny"} />
+          </div>
+        </div>
       </div>
-      <p><strong>ID:</strong> {pokemon.id}</p>
-      <p><strong>Tipos:</strong> {tipos.join(", ")}</p>
-      <p><strong>Altura:</strong> {pokemon.altura / 10} m</p>
-      <p><strong>Peso:</strong> {pokemon.peso / 10} kg</p>
-      <p><strong>Habilidades:</strong> {habilidades}</p>
-      <p><strong>Debilidades:</strong> {debilidades.join(", ") || "No disponibles"}</p>
+
+      <div className="detail-info">
+        <p><strong>ID:</strong> {pokemon.id}</p>
+        <p><strong>Tipos:</strong> {tipos.join(", ")}</p>
+        <p><strong>Altura:</strong> {pokemon.altura / 10} m</p>
+        <p><strong>Peso:</strong> {pokemon.peso / 10} kg</p>
+        <p><strong>Habilidades:</strong> {habilidades}</p>
+        <p><strong>Debilidades:</strong> {debilidades.join(", ") || "No disponibles"}</p>
+      </div>
     </div>
   );
 };

@@ -21,16 +21,31 @@ body {
   margin-top: 2rem;
 }
 
-.pokemon-container h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-}
-
 .pokemon-container h2 {
   font-size: 2rem;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
   color: #fff;
+}
+
+.titulo-brillante {
+  font-size: 2.4rem;
+  text-align: center;
+  margin-bottom: 1.2rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #ffdd57, #ff44cc, #44ccff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    filter: drop-shadow(0 0 6px #ffffff90);
+  }
+  to {
+    filter: drop-shadow(0 0 16px #ffff0090);
+  }
 }
 
 .acciones {
@@ -43,36 +58,48 @@ body {
 }
 
 .acciones input,
-.acciones select {
-  padding: 0.6rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 1px solid #aaa;
-  background-color: #222;
-  color: white;
-}
-
-/* Botón ¡Sorpréndeme! */
-.sorprendeme-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background-color: #29b6f6;
-  color: white;
-  font-weight: bold;
-  border: none;
-  padding: 0.8rem 1.5rem;
+.acciones select,
+.acciones button {
+  padding: 0.75rem 1rem;
   font-size: 1rem;
   border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  background-color: #222;
+  color: white;
+  margin: 0;
+  height: 48px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
-.sorprendeme-button:hover {
-  background-color: #0288d1;
-  transform: scale(1.02);
+.acciones select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 1px solid #aaa;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M2%200L0%202h4L2%200zM2%205l2-2H0l2%202z%22/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  padding-right: 30px;
+}
+
+.boton-moderno {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.boton-moderno:hover {
+  transform: scale(1.05);
+}
+
+.volver {
+  background-color: white;
+  color: black;
 }
 
 .pokemon-list {
@@ -101,7 +128,7 @@ body {
 
 .pokemon-card img {
   width: 120px;
-  height: 120px;
+  height: auto;
   margin-bottom: 8px;
 }
 
@@ -118,7 +145,6 @@ body {
   font-weight: bold;
 }
 
-/* Botón Ver shiny */
 .shiny-button {
   margin-top: 8px;
   background-color: #333;
@@ -134,7 +160,6 @@ body {
   background-color: #555;
 }
 
-/* Etiquetas de tipo */
 .tipo-label {
   display: inline-block;
   padding: 3px 8px;
@@ -146,7 +171,6 @@ body {
   text-transform: capitalize;
 }
 
-/* Colores por tipo */
 .tipo-fire { background-color: #f08030; }
 .tipo-water { background-color: #6890f0; }
 .tipo-grass { background-color: #78c850; }
@@ -166,7 +190,6 @@ body {
 .tipo-steel { background-color: #b8b8d0; }
 .tipo-fairy { background-color: #ee99ac; }
 
-/* Cargar más Pokémon */
 .cargar-mas {
   margin-top: 2rem;
 }
@@ -199,4 +222,3 @@ body {
     margin-top: 1rem;
   }
 }
-
